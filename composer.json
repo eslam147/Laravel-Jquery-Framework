@@ -1,5 +1,5 @@
 {
-    "name": "frontend/jquery-framework",
+    "name": "jquery-framework",
     "description": "A Laravel-like frontend framework for jQuery",
     "type": "library",
     "license": "MIT",
