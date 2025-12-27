@@ -105,7 +105,7 @@ class ButtonController extends Controller {
         return '.button'; // or '#button' if created with --id
     }
     
-    public function onClick(e,request,  id, variation_id = null) {
+    public function click(e,request,  id, variation_id = null) {
         // Access parameters directly from data-* attributes
         console.log('ID:', id);
         console.log('Variation ID:', variation_id);
@@ -122,10 +122,10 @@ class ButtonController extends Controller {
 
 ```javascript
 // Simple route without element return
-Route.get('/data', [ButtonController::class, 'onClick']);
+Route.get('/data', [ButtonController::class, 'click']);
 
 // POST route
-Route.post('/posts', [PostController::class, 'onSubmit']);
+Route.post('/posts', [PostController::class, 'submit']);
 ```
 ## 🛣️ New Route Added
 ```javascript
