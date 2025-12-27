@@ -3,6 +3,8 @@
     "description": "A Laravel-like frontend framework for jQuery",
     "type": "library",
     "license": "MIT",
+    "minimum-stability": "dev",
+    "prefer-stable": true,
     "authors": [
         {
             "name": "Eslam Mohamed"
