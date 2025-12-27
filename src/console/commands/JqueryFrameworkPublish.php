@@ -13,6 +13,8 @@ class JqueryFrameworkPublish extends Command
     public function handle()
     {
         $basePath = public_path('Jquery-Framework');
+        $artisanTarget = base_path('artisanJs');
+        $artisanSource = base_path('vendor/Jquery-Framework/src/artisanJs');
         $directories = [
             $basePath . '/app/Http/Controllers',
             $basePath . '/app/Http/Requests',
@@ -27,6 +29,22 @@ class JqueryFrameworkPublish extends Command
                 File::makeDirectory($dir, 0755, true);
                 $this->line("<info>Created:</info> " . str_replace(public_path(), '', $dir));
             }
+        }
+        if (!File::exists($artisanTarget)) {
+            if (File::exists($artisanSource)) {
+                File::copy($artisanSource, $artisanTarget);
+        
+                // Make executable on Unix systems
+                if (PHP_OS_FAMILY !== 'Windows') {
+                    chmod($artisanTarget, 0755);
+                }
+        
+                $this->info("artisanJs file published to project root.");
+            } else {
+                $this->warn("artisanJs source file not found in vendor.");
+            }
+        } else {
+            $this->line("artisanJs already exists, skipped.");
         }
         $vEnPath = base_path('vendor/Jquery-Framework/src/lang/en/validation.js');
         $vArPath = base_path('vendor/Jquery-Framework/src/lang/ar/validation.js');

@@ -1,0 +1,72 @@
+#!/usr/bin/env node
+
+const fs = require('fs');
+const path = require('path');
+
+// Colors
+const colors = {
+  reset: '\x1b[0m',
+  green: '\x1b[32m',
+  red: '\x1b[31m',
+  yellow: '\x1b[33m',
+  blue: '\x1b[34m',
+  cyan: '\x1b[36m'
+};
+
+// Commands
+const MakeRequestCommand = require('./vendor/Jquery-Framework/src/console/commands/MakeRequestCommand.js');
+const MakeControllerCommand = require('./vendor/Jquery-Framework/src/console/commands/MakeControllerCommand.js');
+const MakeViewCommand = require('./vendor/Jquery-Framework/src/console/commands/MakeViewCommand.js');
+const DeleteRequestCommand = require('./vendor/Jquery-Framework/src/console/commands/DeleteRequestCommand.js');
+const DeleteControllerCommand = require('./vendor/Jquery-Framework/src/console/commands/DeleteControllerCommand.js');
+
+class ArtisanJs {
+  constructor() {
+    this.commands = {};
+    this.registerCommands();
+  }
+
+  registerCommands() {
+    this.commands['make:request'] = MakeRequestCommand;
+    this.commands['make:controller'] = MakeControllerCommand;
+    this.commands['make:view'] = MakeViewCommand;
+    this.commands['delete:request'] = DeleteRequestCommand;
+    this.commands['delete:controller'] = DeleteControllerCommand;
+  }
+
+  run(args) {
+    if (!args.length) return this.showHelp();
+
+    const command = args[0].toLowerCase();
+    const commandArgs = args.slice(1);
+    const commandKey = Object.keys(this.commands).find(k => k.toLowerCase() === command);
+
+    if (!commandKey) {
+      console.error(colors.red + 'Command not found: ' + args[0] + colors.reset);
+      return;
+    }
+
+    try {
+      const instance = new this.commands[commandKey]();
+      instance.handle(commandArgs);
+    } catch (e) {
+      console.error(colors.red + 'Error: ' + e.message + colors.reset);
+      if (process.env.DEBUG) console.error(e.stack);
+    }
+  }
+
+  showHelp() {
+    console.log(colors.cyan + '\n🚀 jQuery Framework ArtisanJs\n' + colors.reset);
+    console.log(colors.green + '  make:request <Name>' + colors.reset);
+    console.log(colors.green + '  make:controller <Name>' + colors.reset);
+    console.log(colors.green + '  make:view <Name>' + colors.reset);
+    console.log(colors.green + '  delete:request <Name>' + colors.reset);
+    console.log(colors.green + '  delete:controller <Name>' + colors.reset);
+  }
+}
+
+let args = process.argv.slice(2);
+if (args[0] === 'artisanJs' || args[0] === 'artisanJs.js') args = args.slice(1);
+
+if (!args.length || args[0] === '--help' || args[0] === '-h') new ArtisanJs().showHelp();
+else new ArtisanJs().run(args);
