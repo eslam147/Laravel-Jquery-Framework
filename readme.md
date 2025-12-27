@@ -110,8 +110,8 @@ class ButtonController extends Controller {
         console.log('ID:', id);
         console.log('Variation ID:', variation_id);
         // Or access via request object
-        console.log('All data:', request->all());
-        console.log('ID from request:', request->id);
+        console.log('All data:', request.all());
+        console.log('ID from request:', request.id);
         // Use view helper to render templates
         return view('welcome', '#result', compact('id', 'variation_id'));        
     }
