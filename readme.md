@@ -29,6 +29,13 @@ composer require frontend/jquery-framework
 php artisan jquery:publish
 ```
 
+### 3. Add boot Script in Resource File
+
+```bash
+<script src="{{ asset('Jquery-Framework/scripts/boot.js') }}"></script>
+```
+
+
 ---
 
 ## 📚 Usage
