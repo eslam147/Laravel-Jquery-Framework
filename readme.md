@@ -105,7 +105,7 @@ class ButtonController extends Controller {
         return '.button'; // or '#button' if created with --id
     }
     
-    public function click(e,request,  id, variation_id = null) {
+    public function click(request,  id, variation_id = null) {
         // Access parameters directly from data-* attributes
         console.log('ID:', id);
         console.log('Variation ID:', variation_id);
@@ -148,7 +148,7 @@ The recommended way to open modals is using the `view()` helper. The modal will 
 If you need to pass parameters to the modal view:
 
 ```javascript
-public function onClick(id) {
+public function click(id) {
     // Render modal view with parameters and automatically open it
     return view('modal1', '#modal-content', compact('id'));
     
@@ -164,7 +164,7 @@ public function onClick(id) {
 If you don't need to pass any parameters:
 
 ```javascript
-public function onClick(e) {
+public function click() {
     // Render modal view without parameters and automatically open it
     return view('modal2', '#modal-content');
     
