@@ -1,0 +1,172 @@
+namespace App\Http\Controllers;
+use Jquery-Framework\scripts\Controller;
+
+class {{CLASS_NAME}} extends Controller
+{
+    public function selector()
+    {
+        return '{{SELECTOR}}';
+    }
+
+    /* ================= Form Events ================= */
+
+    public function submit() {
+
+    }
+    public function reset() {
+
+    }
+
+    /* ================= Input Events ================= */
+
+    public function change() {
+
+    }
+    public function input() {
+
+    }
+    public function blur() {
+
+    }
+    public function focus() {
+
+    }
+    public function focusin() {
+
+    }
+    public function focusout() {
+
+    }
+    public function select() {
+
+    }
+    public function invalid() {
+
+    }
+
+    /* ================= Mouse Events ================= */
+
+    public function click() {
+
+    }
+    public function dblclick() {
+
+    }
+    public function contextmenu() {
+
+    }
+    public function mouseenter() {
+
+    }
+    public function mouseleave() {
+
+    }
+    public function mouseover() {
+
+    }
+    public function mouseout() {
+
+    }
+    public function mousedown() {
+
+    }
+    public function mouseup() {
+
+    }
+    public function mousemove() {
+
+    }
+    public function wheel() {
+
+    }
+
+    /* ================= Keyboard Events ================= */
+
+    public function keyup() {
+
+    }
+    public function keydown() {
+
+    }
+    public function keypress() {
+
+    }
+
+    /* ================= Touch Events ================= */
+
+    public function touchstart() {
+
+    }
+    public function touchend() {
+
+    }
+    public function touchmove() {
+
+    }
+    public function touchcancel() {
+
+    }
+
+    /* ================= Drag & Drop Events ================= */
+
+    public function drag() {
+
+    }
+    public function dragstart() {
+
+    }
+    public function dragend() {
+
+    }
+    public function dragover() {
+
+    }
+    public function dragenter() {
+
+    }
+    public function dragleave() {
+
+    }
+    public function drop() {
+
+    }
+
+    /* ================= Window / Document Events ================= */
+
+    public function scroll() {
+
+    }
+    public function resize() {
+
+    }
+    public function load() {
+
+    }
+    public function unload() {
+
+    }
+    public function beforeunload() {
+
+    }
+    public function error() {
+
+    }
+
+    /* ================= Media Events ================= */
+
+    public function play() {
+
+    }
+    public function pause() {
+
+    }
+    public function ended() {
+
+    }
+    public function volumechange() {
+
+    }
+    public function timeupdate() {
+
+    }
+}

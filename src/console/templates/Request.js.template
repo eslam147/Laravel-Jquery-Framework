@@ -1,0 +1,47 @@
+namespace App\Http\Requests;
+use Jquery-Framework\scripts\Requests\FormRequest;
+
+class {{CLASS_NAME}} extends FormRequest {
+    /**
+     * Authorization
+     */
+    public function authorize() {
+        return false;
+    }
+    
+    /**
+     * Rules
+     * You can use string, array, or function format
+     */
+    public function rules() {
+        return {
+        // Example: String format
+        // name: 'required|min:3|max:50',
+        
+        // Example: Array format
+        // email: ['required', 'email'],
+        };
+    }
+
+    /**
+     * Custom messages (Multi-language support)
+     * Uses translation system - messages will be translated based on current locale
+     * You can use: trans(), __(), or lang() - all work the same way
+     */
+    public function messages() {
+        return {
+            // 'field.rule': trans('validation.required', {attribute: trans('validation.attributes.field')})
+    };
+    }
+
+    /**
+     * Custom field attributes (Multi-language support)
+     * Uses translation system - attributes will be translated based on current locale
+     * You can use: trans(), __(), or lang() - all work the same way
+     */
+    public function customAttributes() {
+        return {
+            // field: trans('validation.attributes.field')
+        };
+    }
+}

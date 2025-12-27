@@ -1,0 +1,27 @@
+{
+    "name": "frontend/jquery-framework",
+    "description": "A Laravel-like frontend framework for jQuery",
+    "type": "library",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Eslam Mohamed"
+        }
+    ],
+    "autoload": {
+        "psr-4": {
+            "JqueryFramework\\": "src/"
+        }
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "JqueryFramework\\Providers\\JqueryFrameworkServiceProvider"
+            ]
+        }
+    },
+    "require": {
+        "php": "^8.0",
+        "illuminate/support": "^9.0|^10.0|^11.0"
+    }
+}
