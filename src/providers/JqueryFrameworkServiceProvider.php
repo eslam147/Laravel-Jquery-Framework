@@ -40,7 +40,7 @@ class JqueryFrameworkServiceProvider extends ServiceProvider
         });
         if ($this->app->runningInConsole()) {
             $this->publishes([
-                base_path('vendor/Jquery-Framework/src/scripts') => public_path('jquery-framework/scripts'),
+                base_path('vendor/frontend/jquery-framework/src/scripts') => public_path('jquery-framework/scripts'),
             ], 'jquery-framework');
         }
     }

@@ -14,7 +14,7 @@ class JqueryFrameworkPublish extends Command
     {
         $basePath = public_path('Jquery-Framework');
         $artisanTarget = base_path('artisanJs');
-        $artisanSource = base_path('vendor/Jquery-Framework/src/artisanJs');
+        $artisanSource = base_path('vendor/frontend/jquery-framework/src/artisanJs');
         $directories = [
             $basePath . '/app/Http/Controllers',
             $basePath . '/app/Http/Requests',
@@ -46,12 +46,12 @@ class JqueryFrameworkPublish extends Command
         } else {
             $this->line("artisanJs already exists, skipped.");
         }
-        $vEnPath = base_path('vendor/Jquery-Framework/src/lang/en/validation.js');
-        $vArPath = base_path('vendor/Jquery-Framework/src/lang/ar/validation.js');
+        $vEnPath = base_path('vendor/frontend/jquery-framework/src/lang/en/validation.js');
+        $vArPath = base_path('vendor/frontend/jquery-framework/src/lang/ar/validation.js');
         $validationEn = File::exists($vEnPath) ? File::get($vEnPath) : "export default {};";
         $validationAr = File::exists($vArPath) ? File::get($vArPath) : "export default {};";
         $files = [
-            $basePath . '/routes/web.js' => "import Route from '../../vendor/jquery-framework/scripts/Route.js';\n\n// Route.get('/', 'HomeController@index');",
+            $basePath . '/routes/web.js' => "import Route from '../../vendor/frontend/jquery-framework/scripts/Route.js';\n\n// Route.get('/', 'HomeController@index');",
             $basePath . '/config/app.js' => "export default {\n    locale: 'ar',\n    availableLocales: ['ar', 'en'],\n    fallbackLocale: 'en'\n};",
             $basePath . '/lang/en/validation.js' => $validationEn,
             $basePath . '/lang/ar/validation.js' => $validationAr,
@@ -64,7 +64,7 @@ class JqueryFrameworkPublish extends Command
         }
         // 4. عملية الربط (Symlink) - تم دمجها هنا مباشرة بدلاً من دالة خارجية
         $target = public_path('jquery-framework/scripts');
-        $source = base_path('vendor/Jquery-Framework/src/scripts');
+        $source = base_path('vendor/frontend/jquery-framework/src/scripts');
         if (PHP_OS_FAMILY === 'Windows') {
             if (File::exists($target)) {
                 $this->info("Removing old link...");
