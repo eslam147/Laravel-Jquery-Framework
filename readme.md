@@ -129,7 +129,7 @@ node artisanJs make:controller Auth/LoginController
 Creates:
 
 ```text
-app/Http/Controllers/Auth/LoginController.js
+public/Jquery-Framework/app/Http/Controllers/Auth/LoginController.js
 ```
 
 ---
