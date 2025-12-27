@@ -51,7 +51,7 @@ class JqueryFrameworkPublish extends Command
         $validationEn = File::exists($vEnPath) ? File::get($vEnPath) : "export default {};";
         $validationAr = File::exists($vArPath) ? File::get($vArPath) : "export default {};";
         $files = [
-            $basePath . '/routes/web.js' => "import Route from '../../vendor/frontend/jquery-framework/scripts/Route.js';\n\n// Route.get('/', 'HomeController@index');",
+            $basePath . '/routes/web.js' => "use Jquery-Framework\scripts\Route;\n\n// Route.get('/', 'HomeController@index');",
             $basePath . '/config/app.js' => "export default {\n    locale: 'ar',\n    availableLocales: ['ar', 'en'],\n    fallbackLocale: 'en'\n};",
             $basePath . '/lang/en/validation.js' => $validationEn,
             $basePath . '/lang/ar/validation.js' => $validationAr,
