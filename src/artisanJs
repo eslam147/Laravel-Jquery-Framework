@@ -14,11 +14,11 @@ const colors = {
 };
 
 // Commands
-const MakeRequestCommand = require('./vendor/Jquery-Framework/src/console/commands/MakeRequestCommand.js');
-const MakeControllerCommand = require('./vendor/Jquery-Framework/src/console/commands/MakeControllerCommand.js');
-const MakeViewCommand = require('./vendor/Jquery-Framework/src/console/commands/MakeViewCommand.js');
-const DeleteRequestCommand = require('./vendor/Jquery-Framework/src/console/commands/DeleteRequestCommand.js');
-const DeleteControllerCommand = require('./vendor/Jquery-Framework/src/console/commands/DeleteControllerCommand.js');
+const MakeRequestCommand = require('./vendor/frontend/jquery-framework/src/console/commands/MakeRequestCommand.js');
+const MakeControllerCommand = require('./vendor/frontend/jquery-framework/src/console/commands/MakeControllerCommand.js');
+const MakeViewCommand = require('./vendor/frontend/jquery-framework/src/console/commands/MakeViewCommand.js');
+const DeleteRequestCommand = require('./vendor/frontend/jquery-framework/src/console/commands/DeleteRequestCommand.js');
+const DeleteControllerCommand = require('./vendor/frontend/jquery-framework/src/console/commands/DeleteControllerCommand.js');
 
 class ArtisanJs {
   constructor() {
