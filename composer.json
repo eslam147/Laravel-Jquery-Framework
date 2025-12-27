@@ -1,5 +1,5 @@
 {
-    "name": "./jquery-framework",
+    "name": "frontend/jquery-framework",
     "description": "A Laravel-like frontend framework for jQuery",
     "type": "library",
     "license": "MIT",
@@ -22,6 +22,15 @@
             ]
         }
     },
+    "repositories": [
+        {
+            "type": "path",
+            "url": "../Jquery-Framework",
+            "options": {
+                "symlink": true
+            }
+        }
+    ],
     "require": {
         "php": "^8.0",
         "illuminate/support": "^9.0|^10.0|^11.0"
