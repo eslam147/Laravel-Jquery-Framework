@@ -32,7 +32,19 @@ php artisan jquery:publish
 ### 3. Add boot Script in Resource File
 
 ```bash
-<script src="{{ asset('Jquery-Framework/scripts/boot.js') }}"></script>
+<script type="module" src="{{ asset('Jquery-Framework/scripts/boot.js') }}"></script>
+```
+
+### 4. Add meta csrf tag in Resource File head
+
+```bash
+<meta name="csrf-token" content="{{ csrf_token() }}">
+```
+
+### 5. Add provider in your project
+
+```bash
+    JqueryFramework\Providers\JqueryFrameworkServiceProvider::class,
 ```
 
 
