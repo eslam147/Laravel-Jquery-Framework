@@ -207,14 +207,14 @@ export class EventHandler {
                                 const RequestModule = await import(getPath('app', `Http/Requests/${RequestClassName}.js`));
                                 RequestClass = RequestModule.default;
                             } catch (importError) {
-                                const RequestModule = await import(getPath('vendor', `Jquery-Framework/src/Requests/Request.js`));
+                                const RequestModule = await import(getPath('base', `Jquery-Framework/scripts/Requests/Request.js`));
                                 RequestClass = RequestModule.default;
                             }
                         }
                         request = new RequestClass(this.selector);
                     } else {
                         // إذا لم يكن هناك RequestClassName، استخدم Request عادي (بدون فاليديشن)
-                        const RequestModule = await import(getPath('vendor', `Jquery-Framework/src/Requests/Request.js`));
+                        const RequestModule = await import(getPath('base', `Jquery-Framework/scripts/Requests/Request.js`));
                         const RequestClass = RequestModule.default;
                         request = new RequestClass(this.selector);
                     }
@@ -346,14 +346,14 @@ export class EventHandler {
                         const RequestModule = await import(getPath('app', `Http/Requests/${RequestClassName}.js`));
                         RequestClass = RequestModule.default;
                     } catch (importError) {
-                        const RequestModule = await import(getPath('vendor', `Jquery-Framework/src/Requests/Request.js`));
+                        const RequestModule = await import(getPath('base', `Jquery-Framework/scripts/Requests/Request.js`));
                         RequestClass = RequestModule.default;
                     }
                 }
                 request = new RequestClass(this.selector);
             } else {
                 // إذا لم يكن هناك RequestClassName، استخدم Request عادي (بدون فاليديشن)
-                const RequestModule = await import(getPath('vendor', `Jquery-Framework/src/Requests/Request.js`));
+                const RequestModule = await import(getPath('base', `Jquery-Framework/scripts/Requests/Request.js`));
                 const RequestClass = RequestModule.default;
                 request = new RequestClass(this.selector);
             }
@@ -397,6 +397,9 @@ export class EventHandler {
             if (eventName === 'submit' && hasErrors) {
                 // منع تنفيذ الـ method إذا كانت هناك أخطاء
                 return;
+            } else if(eventName === 'submit' && !hasErrors) {
+                const result = await this.executeMethod(request, RequestClassName, event);
+                return result;
             }
             // تنفيذ الـ method إذا لم تكن هناك أخطاء (للـ submit) أو لأي حدث آخر
             if (request && (eventName !== 'submit' || !hasErrors)) {
@@ -448,9 +451,12 @@ export class EventHandler {
             // استخراج القيم للـ parameters من request
             const paramValues = [];
             const paramNames = [];
+            let extraDeclarations = '';
             params.forEach(paramName => {
                 if(!paramName) return;
-                
+                if (paramName && paramName !== 'request' && paramName.endsWith('Request')) {
+                    paramName = 'Request';
+                }
                 // تخطي request و event (سيتم تمريرهما بشكل خاص)
                 if(paramName === 'request' || paramName.toLowerCase() === 'request') {
                     paramNames.push('request');
@@ -485,6 +491,7 @@ export class EventHandler {
                     }
                 }
             });
+            
             if(typeof window !== 'undefined') {
                 window.currentController = this.controller;
             }
@@ -511,7 +518,7 @@ export class EventHandler {
             const result = wrappedMethod.apply(this.controller, paramValues);
             return result;
         } catch (err) {
-            // Silent error handling
+            console.log(err);
             return null;
         }
     }
@@ -551,7 +558,7 @@ export class EventHandler {
     // Fallback في حالة فشل إنشاء Request
     async fallbackRequest(err) {
         try {
-            const RequestModule = await import(getPath('vendor', `Jquery-Framework/src/Requests/Request.js`));
+            const RequestModule = await import(getPath('base', `Jquery-Framework/scripts/Requests/Request.js`));
             const RequestClass = RequestModule.default;
             // التأكد من وجود selector
             if (!this.selector) {
