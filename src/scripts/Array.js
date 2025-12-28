@@ -5,7 +5,38 @@ class Collection {
     }
 
     all() { return this.items; }
-
+    first(callback = null, defaultValue = null) {
+        if (!callback) return this.items[0] ?? defaultValue;
+        return this.items.find(callback) ?? defaultValue;
+    }
+    last(callback = null, defaultValue = null) {
+        if (!callback) return this.items[this.items.length - 1] ?? defaultValue;
+        for (let i = this.items.length - 1; i >= 0; i--) {
+            if (callback(this.items[i])) return this.items[i];
+        }
+        return defaultValue;
+    }
+    get(index, defaultValue = null) { return this.items[index] ?? defaultValue; }
+    has(index) { return index >= 0 && index < this.items.length; }
+    // ================= Transformation =================
+    map(callback) { return new Collection(this.items.map(callback)); }
+    mapWithKeys(callback) {
+        const obj = {};
+        this.items.forEach(item => Object.assign(obj, callback(item)));
+        return new Collection(obj);
+    }
+    filter(callback) { return new Collection(this.items.filter(callback)); }
+    reject(callback) { return new Collection(this.items.filter(i => !callback(i))); }
+    flatten(depth = Infinity) {
+        const flat = (arr, d) => arr.reduce((acc, val) => {
+            if (Array.isArray(val) && d > 0) return acc.concat(flat(val, d - 1));
+            else return acc.concat(val);
+        }, []);
+        return new Collection(flat(this.items, depth));
+    }
+    collapse() {
+        return new Collection(this.items.reduce((acc, val) => acc.concat(val), []));
+    }
     // ==== Filtering ====
     where(key, value) { return new Collection(this.items.filter(i=>i[key]===value)); }
     whereIn(key, arr) { return new Collection(this.items.filter(i=>arr.includes(i[key]))); }
@@ -139,10 +170,27 @@ class Collection {
         }));
     }
 
-    sortBy(key) {
-        return new Collection([...this.items].sort((a,b)=>a[key]-b[key]));
-    }
+    sort(callback) { return new Collection([...this.items].sort(callback)); }
+    sortBy(key) { return this.sort((a,b)=> (a[key] > b[key]?1:(a[key]<b[key]?-1:0))); }
+    sortByDesc(key) { return this.sort((a,b)=> (a[key] < b[key]?1:(a[key]>b[key]?-1:0))); }
+    reverse() { return new Collection([...this.items].reverse()); }
+    shuffle() { return new Collection([...this.items].sort(()=>Math.random()-0.5)); }
 
+    // ================= Adding & Removing =================
+    push(item) { this.items.push(item); return this; }
+    prepend(item) { this.items.unshift(item); return this; }
+    pop() { return this.items.pop(); }
+    shift() { return this.items.shift(); }
+    merge(items) { return new Collection([...this.items, ...items]); }
+    concat(items) { return this.merge(items); }
+    union(items) {
+        const set = new Set([...this.items, ...items]);
+        return new Collection(Array.from(set));
+    }
+    contains(value) { return this.items.includes(value); }
+    search(value) { return this.items.indexOf(value); }
+    firstWhere(key, val) { return this.items.find(i=>i[key]===val); }
+    lastWhere(key, val) { return [...this.items].reverse().find(i=>i[key]===val); }
     groupBy(key) {
         const grouped = {};
         this.items.forEach(i=>{
@@ -152,7 +200,30 @@ class Collection {
         });
         return new Collection(grouped);
     }
-
+    keyBy(key) {
+        const keyed = {};
+        this.items.forEach(item => {
+            const k = typeof key === 'function' ? key(item) : item[key];
+            keyed[k] = item;
+        });
+        return new Collection(keyed);
+    }
+    chunk(size) {
+        const chunks = [];
+        for (let i = 0; i < this.items.length; i += size) {
+            chunks.push(new Collection(this.items.slice(i, i + size)));
+        }
+        return new Collection(chunks);
+    }
+    // ================= Checking =================
+    isEmpty() { return this.items.length === 0; }
+    isNotEmpty() { return !this.isEmpty(); }
+    every(callback) { return this.items.every(callback); }
+    some(callback) { return this.items.some(callback); }
+    // ================= Conversion =================
+    toArray() { return this.items; }
+    toJSON() { return JSON.stringify(this.items, null, 2); }
+    jsonSerialize() { return this.toJSON(); }
     // ==== dd ====
     dump() {
         const popup = window.open("", "_blank", "width=600,height=600,scrollbars=yes,resizable=yes");
