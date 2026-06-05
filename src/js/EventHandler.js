@@ -1,4 +1,4 @@
-import { getPath } from './pathHelper.js';
+import { getPath } from '@scripts/pathHelper.js';
 
 // دالة لمعالجة الأحداث
 export class EventHandler {
@@ -31,11 +31,18 @@ export class EventHandler {
         const eventKey = `__event_${this.selector}_${this.method}_${eventName}`;
         
         // التحقق من أن الحدث لم يتم ربطه من قبل على هذا العنصر
-        if (targetElement[eventKey]) {
-            return; // الحدث مربوط بالفعل
+        if (targetElement[eventKey] && !window.__hrm_rebind) {
+            return; // الحدث مربوط بالفعل ولا يوجد طلب إعادة ربط
         }
 
-        // إزالة الـ listener السابق إذا كان موجوداً (للأمان)
+        // إزالة الـ listener السابق إذا كان موجوداً (للأمان أو للـ HRM)
+        if (targetElement[eventKey] && window.__hrm_rebind) {
+            // نحن بحاجة لإزالة الـ listener القديم، ولكن بما أننا لا نملك الـ reference هنا مباشرة
+            // سنعتمد على أن detachEvents قد تم استدعاؤها من Controller.js
+            // أو نقوم بتنظيف العلامة للسماح بالربط الجديد
+            delete targetElement[eventKey];
+        }
+
         if (this.eventHandler && this.eventName) {
             targetElement.removeEventListener(this.eventName, this.eventHandler);
         }
@@ -204,7 +211,7 @@ export class EventHandler {
                         // إذا لم يكن موجوداً في global scope، استورده من الملف
                         if (!RequestClass) {
                             try {
-                                const RequestModule = await import(getPath('app', `Http/Requests/${RequestClassName}.js`));
+                                const RequestModule = await import(getPath('base', `Jquery-Framework/app/Http/Requests/${RequestClassName}.js`));
                                 RequestClass = RequestModule.default;
                             } catch (importError) {
                                 const RequestModule = await import(getPath('base', `Jquery-Framework/scripts/Requests/Request.js`));
@@ -343,7 +350,7 @@ export class EventHandler {
                 // إذا لم يكن موجوداً في global scope، استورده من الملف
                 if (!RequestClass) {
                     try {
-                        const RequestModule = await import(getPath('app', `Http/Requests/${RequestClassName}.js`));
+                        const RequestModule = await import(getPath('base', `Jquery-Framework/app/Http/Requests/${RequestClassName}.js`));
                         RequestClass = RequestModule.default;
                     } catch (importError) {
                         const RequestModule = await import(getPath('base', `Jquery-Framework/scripts/Requests/Request.js`));
@@ -424,6 +431,185 @@ export class EventHandler {
         console.error('Authorize Error:', message);
         alert(message);
     }
+    isIdentifierChar(char) {
+        return !!char && /[A-Za-z0-9_$]/.test(char);
+    }
+    findNextDeclaration(source, startIndex = 0) {
+        const keywords = ['const', 'let', 'var'];
+        let quote = null;
+        let escaped = false;
+        let lineComment = false;
+        let blockComment = false;
+        for (let i = startIndex; i < source.length; i++) {
+            const char = source[i];
+            const next = source[i + 1];
+            if (lineComment) {
+                if (char === '\n') lineComment = false;
+                continue;
+            }
+            if (blockComment) {
+                if (char === '*' && next === '/') {
+                    blockComment = false;
+                    i++;
+                }
+                continue;
+            }
+            if (quote) {
+                if (escaped) {
+                    escaped = false;
+                    continue;
+                }
+                if (char === '\\') {
+                    escaped = true;
+                    continue;
+                }
+                if (char === quote) quote = null;
+                continue;
+            }
+            if (char === '/' && next === '/') {
+                lineComment = true;
+                i++;
+                continue;
+            }
+            if (char === '/' && next === '*') {
+                blockComment = true;
+                i++;
+                continue;
+            }
+            if (char === '"' || char === "'" || char === '`') {
+                quote = char;
+                continue;
+            }
+            for (const keyword of keywords) {
+                if (
+                    source.slice(i, i + keyword.length) === keyword &&
+                    !this.isIdentifierChar(source[i - 1]) &&
+                    !this.isIdentifierChar(source[i + keyword.length])
+                ) {
+                    return { index: i, keyword };
+                }
+            }
+        }
+        return null;
+    }
+    findExpressionEnd(source, startIndex) {
+        let quote = null;
+        let escaped = false;
+        let lineComment = false;
+        let blockComment = false;
+        let parenDepth = 0;
+        let bracketDepth = 0;
+        let braceDepth = 0;
+        for (let i = startIndex; i < source.length; i++) {
+            const char = source[i];
+            const next = source[i + 1];
+            if (lineComment) {
+                if (char === '\n') lineComment = false;
+                continue;
+            }
+            if (blockComment) {
+                if (char === '*' && next === '/') {
+                    blockComment = false;
+                    i++;
+                }
+                continue;
+            }
+            if (quote) {
+                if (escaped) {
+                    escaped = false;
+                    continue;
+                }
+                if (char === '\\') {
+                    escaped = true;
+                    continue;
+                }
+                if (char === quote) quote = null;
+                continue;
+            }
+            if (char === '/' && next === '/') {
+                lineComment = true;
+                i++;
+                continue;
+            }
+            if (char === '/' && next === '*') {
+                blockComment = true;
+                i++;
+                continue;
+            }
+            if (char === '"' || char === "'" || char === '`') {
+                quote = char;
+                continue;
+            }
+            if (char === '(') parenDepth++;
+            else if (char === ')') parenDepth--;
+            else if (char === '[') bracketDepth++;
+            else if (char === ']') bracketDepth--;
+            else if (char === '{') braceDepth++;
+            else if (char === '}') braceDepth--;
+            else if (char === ';' && parenDepth === 0 && bracketDepth === 0 && braceDepth === 0) {
+                return i;
+            }
+        }
+        return -1;
+    }
+    findAssignedDeclaration(source, declaration) {
+        let index = declaration.index + declaration.keyword.length;
+        while (/\s/.test(source[index] || '')) index++;
+        if (!/[A-Za-z_$]/.test(source[index] || '')) return null;
+        const nameStart = index;
+        index++;
+        while (this.isIdentifierChar(source[index])) index++;
+        const name = source.slice(nameStart, index);
+        while (/\s/.test(source[index] || '')) index++;
+        if (source[index] !== '=') return null;
+        const expressionStart = index + 1;
+        const expressionEnd = this.findExpressionEnd(source, expressionStart);
+        if (expressionEnd === -1 || expressionEnd <= expressionStart) return null;
+        return { name, expressionStart, expressionEnd };
+    }
+    registerLocalRelations(functionBody) {
+        const replacements = [];
+        let index = 0;
+        while (index < functionBody.length) {
+            const declaration = this.findNextDeclaration(functionBody, index);
+            if (!declaration) break;
+            const assigned = this.findAssignedDeclaration(functionBody, declaration);
+            if (!assigned) {
+                index = declaration.index + declaration.keyword.length;
+                continue;
+            }
+            replacements.push(assigned);
+            index = assigned.expressionEnd + 1;
+        }
+        let transformedBody = functionBody;
+        for (let i = replacements.length - 1; i >= 0; i--) {
+            const { name, expressionStart, expressionEnd } = replacements[i];
+            const expression = transformedBody.slice(expressionStart, expressionEnd);
+            transformedBody = [
+                transformedBody.slice(0, expressionStart),
+                ` __registerLocalRelation("${name}",`,
+                expression,
+                ')',
+                transformedBody.slice(expressionEnd)
+            ].join('');
+        }
+        return `
+const __relationRoot = typeof globalThis !== "undefined" ? globalThis : (typeof window !== "undefined" ? window : {});
+const __previousCollectionRelationScope = __relationRoot.__collectionRelationScope;
+const __currentCollectionRelationScope = Object.create(__previousCollectionRelationScope || null);
+__relationRoot.__collectionRelationScope = __currentCollectionRelationScope;
+if (typeof window !== "undefined") window.__collectionRelationScope = __currentCollectionRelationScope;
+const __registerLocalRelation = (name, value) => {
+    __currentCollectionRelationScope[name] = value;
+    return value;
+};
+try {
+${transformedBody}
+} finally {
+    __relationRoot.__collectionRelationScope = __previousCollectionRelationScope;
+    if (typeof window !== "undefined") window.__collectionRelationScope = __previousCollectionRelationScope;
+}`;
+    }
     async executeMethod(request, RequestClassName, event) {
         try {
             const originalMethod = this.controller[this.method];
@@ -451,11 +637,10 @@ export class EventHandler {
             // استخراج القيم للـ parameters من request
             const paramValues = [];
             const paramNames = [];
-            let extraDeclarations = '';
             params.forEach(paramName => {
                 if(!paramName) return;
-                if (paramName && paramName !== 'request' && paramName.endsWith('Request')) {
-                    paramName = 'Request';
+                if(paramName.endsWith('Request')) {
+                    paramName = 'request';
                 }
                 // تخطي request و event (سيتم تمريرهما بشكل خاص)
                 if(paramName === 'request' || paramName.toLowerCase() === 'request') {
@@ -491,7 +676,6 @@ export class EventHandler {
                     }
                 }
             });
-            
             if(typeof window !== 'undefined') {
                 window.currentController = this.controller;
             }
@@ -513,12 +697,13 @@ export class EventHandler {
             if (RequestClassName && RequestClassName !== 'request' && !paramNames.includes(RequestClassName)) {
                 functionBody = `const ${RequestClassName} = request;\n${functionBody}`;
             }
+            functionBody = this.registerLocalRelations(functionBody);
             const wrappedMethod = new Function(functionParams, functionBody);
             // تمرير جميع parameters
             const result = wrappedMethod.apply(this.controller, paramValues);
             return result;
         } catch (err) {
-            console.log(err);
+            // Silent error handling
             return null;
         }
     }
@@ -660,5 +845,23 @@ export class EventHandler {
             backdrops.forEach(backdrop => backdrop.remove());
         }
     }
-}
 
+    // إزالة الأحداث (مهم للـ Hot Reload)
+    detachEvents() {
+        if (!this.eventHandler || !this.eventName) {
+            console.warn(`[HRM] Cannot detach: missing eventHandler or eventName`, this);
+            return;
+        }
+        
+        // البحث عن العنصر إذا لم يكن محفوظاً أو إذا تم تحديث الـ DOM
+        const targetElement = document.querySelector(this.selector);
+        if (!targetElement) {
+            console.warn(`[HRM] Cannot detach: selector ${this.selector} not found in DOM`);
+            return;
+        }
+
+        const eventKey = `__event_${this.selector}_${this.method}_${this.eventName}`;
+        targetElement.removeEventListener(this.eventName, this.eventHandler);
+        delete targetElement[eventKey];
+    }
+}
