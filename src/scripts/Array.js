@@ -1,7 +1,27 @@
 class Collection {
     constructor(items = [], name = 'Collection') {
-        this.items = Array.isArray(items) ? items : Object.values(items);
         this.name = name;
+        if (
+            typeof items === 'string' ||
+            typeof items === 'number' ||
+            typeof items === 'boolean'
+        ) {
+            this.items = [items];
+            this.isAssoc = false;
+            return;
+        }
+        if (Array.isArray(items)) {
+            this.items = items;
+            this.isAssoc = false;
+            return;
+        }
+        if (items && typeof items === 'object') {
+            this.items = items;
+            this.isAssoc = true;
+            return;
+        }
+        this.items = [];
+        this.isAssoc = false;
     }
 
     all() { return this.items; }
@@ -304,7 +324,6 @@ class Collection {
         title.style.color = "#00FFFF";
         title.style.marginBottom = "10px";
         doc.body.appendChild(title);
-
         this.items.forEach((item,index)=>{
             const header = doc.createElement('div');
             const toggle = doc.createElement('span');
@@ -357,9 +376,24 @@ class Collection {
 // ==== Helpers ====
 window.collect = (items, name='Collection') => new Collection(items, name);
 window.dd = (...args) => {
-    args.forEach(a=>{
-        if(a instanceof Collection) a.dump();
-        else console.log(a);
+    args.forEach(a => {
+        // لو Collection بالفعل
+        if (a instanceof Collection) {
+            a.dump();
+            return;
+        }
+        // لو Array أو Object
+        if (typeof a === 'object' && a !== null) {
+            collect(a, 'Auto Collection').dump();
+            return;
+        }
+        // لو قيمة بسيطة
+        const popup = window.open("", "_blank", "width=600,height=400");
+        popup.document.body.style.fontFamily = "Menlo, Monaco, Consolas, monospace";
+        popup.document.body.style.background = "#18171B";
+        popup.document.body.style.color = "#FFA500";
+        popup.document.body.style.padding = "10px";
+        popup.document.body.textContent = a;
     });
     throw new Error("dd stop");
 };
