@@ -218,6 +218,17 @@ class Collection {
             fn = foreignKey;
             foreignKey = null;
         }
+        const relationParts = typeof relation === 'string'
+            ? relation.split('.').filter(Boolean)
+            : [];
+        if (relationParts.length > 1) {
+            const parentRelation = relationParts.shift();
+            const nestedRelation = relationParts.join('.');
+            return this.with(parentRelation, related, localKey, foreignKey, (query) => {
+                query.with(nestedRelation, fn);
+                return query;
+            });
+        }
         const relationSource = related ?? this.resolveRelationSource(relation);
         if (relationSource === null || relationSource === undefined) {
             const items = Array.isArray(this.items)
